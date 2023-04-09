@@ -1,5 +1,5 @@
 import 'dotenv/config';
-
+import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
@@ -14,10 +14,22 @@ const app = express();
 mongoose.connect(DB_ADDRESS);
 
 // Только для локальных тестов. Не используйте это в продакшене
-app.use(cors())
+app.use(cors({
+  origin: [
+    'http://project.lev.nomoredomains.monster',
+    'https://project.lev.nomoredomains.monster',
+  ],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 app.use(routes);
 app.use(errors());
 app.use(errorHandler);
